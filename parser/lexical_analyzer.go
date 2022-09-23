@@ -10,7 +10,7 @@ func NewLexicalAnalyzer(input string) (parser *LexicalAnalyzer) {
 		inputStream: input,
 		curChar:     0,
 		curPos:      0,
-		curToken:    "",
+		curToken:    Undefined,
 	}
 	parser.nextChar()
 	return parser
@@ -52,7 +52,7 @@ func (lexicalAnalyzer *LexicalAnalyzer) nextToken() error {
 	case '$':
 		lexicalAnalyzer.curToken = End
 	default:
-		return errors.New(fmt.Sprintf("Illegal character %b", lexicalAnalyzer.curChar))
+		return errors.New(fmt.Sprintf("Illegal character %c at pos %d", lexicalAnalyzer.curChar, lexicalAnalyzer.curPos))
 	}
 	return nil
 }
@@ -69,7 +69,7 @@ func (lexicalAnalyzer *LexicalAnalyzer) matchString(s string) error {
 		} else {
 			lexicalAnalyzer.curPos = oldPos
 			return errors.New(fmt.Sprintf(
-				"%b character expected, %b found at pos %b",
+				"%c character expected, %c found at pos %d",
 				c,
 				lexicalAnalyzer.curChar,
 				lexicalAnalyzer.curPos))
