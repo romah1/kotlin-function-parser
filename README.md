@@ -4,12 +4,29 @@ Example input: `fun printSum(a: Int, b: Int): Unit`
 
 Grammar:
 ```
-S -> fun N
-N -> s(A)
-N -> s(A): t
-A -> V,
-A -> V
-V -> v: t
+Start -> fun Declaration
+Declaration -> name(Arguments)
+Declaraion -> name(Arguments):type
+Arguments -> Variable,Arguments
+Arguments -> VariableAndType
+VariableAndType -> Variableariable:Type
+Variable -> variable
+Type -> type
+```
+
+Removing right branching:
+
+```
+Start -> fun Declaration
+Declaration -> name(Arguments)Ending
+Ending -> eps
+Ending -> :type
+Arguments -> VariableAndTypeVariableAndType-continuation
+VariableAndType-continuation -> ,VariableAndType
+VariableAndType-continuation -> eps
+VariableAndType -> Variable:Type
+Variable -> variable
+Type -> type
 ```
 
 First:
