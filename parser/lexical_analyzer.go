@@ -5,15 +5,15 @@ import (
 	"fmt"
 )
 
-func NewLexicalAnalyzer(input string) (parser *LexicalAnalyzer) {
-	parser = &LexicalAnalyzer{
-		inputStream: input,
+func NewLexicalAnalyzer(input string) *LexicalAnalyzer {
+	lexicalAnalyzer := &LexicalAnalyzer{
+		inputStream: input + End,
 		curChar:     0,
 		curPos:      0,
 		curToken:    Undefined,
 	}
-	parser.nextChar()
-	return parser
+	lexicalAnalyzer.nextChar()
+	return lexicalAnalyzer
 }
 
 func (lexicalAnalyzer *LexicalAnalyzer) Token() Token {
@@ -27,6 +27,10 @@ func (lexicalAnalyzer *LexicalAnalyzer) Pos() int {
 func (lexicalAnalyzer *LexicalAnalyzer) nextChar() {
 	lexicalAnalyzer.curChar = rune(lexicalAnalyzer.inputStream[lexicalAnalyzer.curPos])
 	lexicalAnalyzer.curPos++
+}
+
+func (lexicalAnalyzer *LexicalAnalyzer) hasNext() bool {
+	return lexicalAnalyzer.curPos < len(lexicalAnalyzer.inputStream)
 }
 
 func (lexicalAnalyzer *LexicalAnalyzer) nextToken() error {
@@ -43,6 +47,9 @@ func (lexicalAnalyzer *LexicalAnalyzer) nextToken() error {
 	case ',':
 		lexicalAnalyzer.nextChar()
 		lexicalAnalyzer.curToken = Comma
+	case ':':
+		lexicalAnalyzer.nextChar()
+		lexicalAnalyzer.curToken = Colon
 	case 'f':
 		err := lexicalAnalyzer.matchString("fun")
 		if err != nil {
@@ -77,4 +84,32 @@ func (lexicalAnalyzer *LexicalAnalyzer) matchString(s string) error {
 	}
 	lexicalAnalyzer.nextChar()
 	return nil
+}
+
+//func (lexicalAnalyzer *LexicalAnalyzer) takeUntil(c rune) error {
+//	newToken := Undefined
+//	for lexicalAnalyzer.hasNext() && lexicalAnalyzer.curChar != c {
+//		newToken += Token(lexicalAnalyzer.curChar)
+//		lexicalAnalyzer.nextChar()
+//	}
+//	if lexicalAnalyzer.curChar == c {
+//		lexicalAnalyzer.curToken = newToken
+//		return nil
+//	} else {
+//		return errors.New(fmt.Sprintf("Failed to reach character %c", c))
+//	}
+//}
+
+func (lexicalAnalyzer *LexicalAnalyzer) takeUntil(ignoreRunes map[rune]bool) error {
+	newToken := Undefined
+	for lexicalAnalyzer.hasNext() && !ignoreRunes[lexicalAnalyzer.curChar] {
+		newToken += Token(lexicalAnalyzer.curChar)
+		lexicalAnalyzer.nextChar()
+	}
+	if ignoreRunes[lexicalAnalyzer.curChar] {
+		lexicalAnalyzer.curToken = newToken
+		return nil
+	} else {
+		return errors.New(fmt.Sprintf("Failed to reach character %T", ignoreRunes))
+	}
 }

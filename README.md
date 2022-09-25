@@ -5,8 +5,9 @@ Example input: `fun printSum(a: Int, b: Int): Unit`
 Grammar:
 ```
 Start -> fun Declaration
-Declaration -> name(Arguments)
-Declaraion -> name(Arguments):type
+Declaration -> FunctionName(Arguments)
+Declaraion -> FunctionName(Arguments):Type
+Arguments -> eps
 Arguments -> Variable,Arguments
 Arguments -> VariableAndType
 VariableAndType -> Variableariable:Type
@@ -18,9 +19,11 @@ Removing right branching:
 
 ```
 Start -> fun Declaration
-Declaration -> name(Arguments)Ending
+Declaration -> FunctionName(Arguments)Ending
+FunctionName -> name
 Ending -> eps
-Ending -> :type
+Ending -> :Type
+Arguments -> eps
 Arguments -> VariableAndTypeVariableAndType-continuation
 VariableAndType-continuation -> ,VariableAndType
 VariableAndType-continuation -> eps
