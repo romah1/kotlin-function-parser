@@ -39,3 +39,8 @@ type (
 type Parser struct {
 	lexicalAnalyzer *LexicalAnalyzer
 }
+
+type ParsingError struct {
+	unexpected string
+	expected   string
+}

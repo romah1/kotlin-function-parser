@@ -1,9 +1,19 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 )
+
+func NewParsingError(expected, unexpected string) *ParsingError {
+	return &ParsingError{
+		unexpected: unexpected,
+		expected:   expected,
+	}
+}
+
+func (parsingError *ParsingError) Error() string {
+	return fmt.Sprintf("Expected %s, found %s", parsingError.expected, parsingError.unexpected)
+}
 
 func NewParser(input string) *Parser {
 	return &Parser{
@@ -19,6 +29,10 @@ func (parser *Parser) Parse() (*Tree, error) {
 	return parser.start()
 }
 
+func (parser *Parser) parsingError(expected string) *ParsingError {
+	return NewParsingError(expected, parser.lexicalAnalyzer.curToken)
+}
+
 func (parser *Parser) start() (*Tree, error) {
 	switch parser.lexicalAnalyzer.curToken {
 	case Fun:
@@ -28,7 +42,7 @@ func (parser *Parser) start() (*Tree, error) {
 		}
 		return NewStart(declarationTree), nil
 	default:
-		return nil, errors.New(fmt.Sprintf("Found unexpected token %s", parser.lexicalAnalyzer.curToken))
+		return nil, NewParsingError(Fun, parser.lexicalAnalyzer.curToken)
 	}
 }
 
@@ -53,9 +67,12 @@ func (parser *Parser) declaration() (*Tree, error) {
 				return nil, err
 			}
 			return NewDeclaration(functionNameTree, argumentsTree, endingTree), nil
+		} else {
+			return nil, parser.parsingError(RParen)
 		}
+	} else {
+		return nil, parser.parsingError(LParen)
 	}
-	return nil, errors.New("wtf")
 }
 
 func (parser *Parser) functionName() (*Tree, error) {
@@ -83,7 +100,7 @@ func (parser *Parser) ending() (*Tree, error) {
 	case End:
 		return EmptyEnding, nil
 	default:
-		return nil, errors.New("wtf")
+		return nil, parser.parsingError(fmt.Sprintf("%s or %s", Colon, End))
 	}
 }
 
@@ -115,7 +132,7 @@ func (parser *Parser) variableAndType() (*Tree, error) {
 		}
 		return NewVariableAndType(variableTree, typeTree), nil
 	} else {
-		return nil, errors.New("wtf")
+		return nil, parser.parsingError(Colon)
 	}
 
 }
