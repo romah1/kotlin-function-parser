@@ -36,13 +36,21 @@ func (parser *Parser) parsingError(expected string) *ParsingError {
 func (parser *Parser) start() (*Tree, error) {
 	switch parser.lexicalAnalyzer.curToken {
 	case Fun:
+		err := parser.lexicalAnalyzer.nextToken()
+		if err != nil {
+			return nil, err
+		}
 		declarationTree, err := parser.declaration()
 		if err != nil {
 			return nil, err
 		}
-		return NewStart(declarationTree), nil
+		if parser.lexicalAnalyzer.curToken == End {
+			return NewStart(declarationTree), nil
+		} else {
+			return nil, parser.parsingError(End)
+		}
 	default:
-		return nil, NewParsingError(Fun, parser.lexicalAnalyzer.curToken)
+		return nil, parser.parsingError(Fun)
 	}
 }
 
@@ -52,7 +60,10 @@ func (parser *Parser) declaration() (*Tree, error) {
 		return nil, err
 	}
 	if parser.lexicalAnalyzer.curToken == LParen {
-		_ = parser.lexicalAnalyzer.nextToken()
+		err := parser.lexicalAnalyzer.nextToken()
+		if err != nil {
+			return nil, err
+		}
 		argumentsTree, err := parser.arguments()
 		if err != nil {
 			return nil, err
@@ -76,12 +87,8 @@ func (parser *Parser) declaration() (*Tree, error) {
 }
 
 func (parser *Parser) functionName() (*Tree, error) {
-	err := parser.lexicalAnalyzer.takeUntil(map[rune]bool{rune(LParen[0]): true})
-	if err != nil {
-		return nil, err
-	}
 	name := parser.lexicalAnalyzer.curToken
-	err = parser.lexicalAnalyzer.nextToken()
+	err := parser.lexicalAnalyzer.nextToken()
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +98,10 @@ func (parser *Parser) functionName() (*Tree, error) {
 func (parser *Parser) ending() (*Tree, error) {
 	switch parser.lexicalAnalyzer.curToken {
 	case Colon:
-		_ = parser.lexicalAnalyzer.nextToken()
+		err := parser.lexicalAnalyzer.nextToken()
+		if err != nil {
+			return nil, err
+		}
 		typeTree, err := parser.variableType()
 		if err != nil {
 			return nil, err
@@ -125,7 +135,10 @@ func (parser *Parser) variableAndType() (*Tree, error) {
 		return nil, err
 	}
 	if parser.lexicalAnalyzer.curToken == Colon {
-		_ = parser.lexicalAnalyzer.nextToken()
+		err := parser.lexicalAnalyzer.nextToken()
+		if err != nil {
+			return nil, err
+		}
 		typeTree, err := parser.variableType()
 		if err != nil {
 			return nil, err
@@ -139,7 +152,10 @@ func (parser *Parser) variableAndType() (*Tree, error) {
 
 func (parser *Parser) variableAndTypeContinuation() (*Tree, error) {
 	if parser.lexicalAnalyzer.curToken == Comma {
-		_ = parser.lexicalAnalyzer.nextToken()
+		err := parser.lexicalAnalyzer.nextToken()
+		if err != nil {
+			return nil, err
+		}
 		variableAndTypeTree, err := parser.variableAndType()
 		if err != nil {
 			return nil, err
@@ -151,12 +167,8 @@ func (parser *Parser) variableAndTypeContinuation() (*Tree, error) {
 }
 
 func (parser *Parser) variable() (*Tree, error) {
-	err := parser.lexicalAnalyzer.takeUntil(map[rune]bool{':': true})
-	if err != nil {
-		return nil, err
-	}
 	variable := parser.lexicalAnalyzer.curToken
-	err = parser.lexicalAnalyzer.nextToken()
+	err := parser.lexicalAnalyzer.nextToken()
 	if err != nil {
 		return nil, err
 	}
@@ -164,12 +176,8 @@ func (parser *Parser) variable() (*Tree, error) {
 }
 
 func (parser *Parser) variableType() (*Tree, error) {
-	err := parser.lexicalAnalyzer.takeUntil(map[rune]bool{',': true, ')': true, '$': true})
-	if err != nil {
-		return nil, err
-	}
 	variable := parser.lexicalAnalyzer.curToken
-	err = parser.lexicalAnalyzer.nextToken()
+	err := parser.lexicalAnalyzer.nextToken()
 	if err != nil {
 		return nil, err
 	}

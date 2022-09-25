@@ -37,6 +37,9 @@ func (lexicalAnalyzer *LexicalAnalyzer) nextToken() error {
 	for lexicalAnalyzer.isWhitespace(lexicalAnalyzer.curChar) {
 		lexicalAnalyzer.nextChar()
 	}
+	if lexicalAnalyzer.curToken == End {
+		return errors.New(fmt.Sprintf("Tried to get token after %s was seen", End))
+	}
 	switch lexicalAnalyzer.curChar {
 	case '(':
 		lexicalAnalyzer.nextChar()
@@ -50,16 +53,28 @@ func (lexicalAnalyzer *LexicalAnalyzer) nextToken() error {
 	case ':':
 		lexicalAnalyzer.nextChar()
 		lexicalAnalyzer.curToken = Colon
-	case 'f':
-		err := lexicalAnalyzer.matchString("fun")
-		if err != nil {
-			return err
-		}
-		lexicalAnalyzer.curToken = Fun
 	case '$':
 		lexicalAnalyzer.curToken = End
+	case 'f':
+		if lexicalAnalyzer.checkMatches("fun") {
+			lexicalAnalyzer.curToken = Fun
+			return nil
+		}
+		fallthrough
 	default:
-		return errors.New(fmt.Sprintf("Illegal character %c at pos %d", lexicalAnalyzer.curChar, lexicalAnalyzer.curPos))
+		charSet := map[rune]bool{
+			'(': true,
+			')': true,
+			',': true,
+			':': true,
+			'$': true,
+		}
+		newToken := ""
+		for !charSet[lexicalAnalyzer.curChar] && !lexicalAnalyzer.isWhitespace(lexicalAnalyzer.curChar) {
+			newToken += Token(lexicalAnalyzer.curChar)
+			lexicalAnalyzer.nextChar()
+		}
+		lexicalAnalyzer.curToken = newToken
 	}
 	return nil
 }
@@ -83,33 +98,28 @@ func (lexicalAnalyzer *LexicalAnalyzer) matchString(s string) error {
 		}
 	}
 	lexicalAnalyzer.nextChar()
+	if !lexicalAnalyzer.isWhitespace(lexicalAnalyzer.curChar) {
+
+	}
 	return nil
 }
 
-//func (lexicalAnalyzer *LexicalAnalyzer) takeUntil(c rune) error {
-//	newToken := Undefined
-//	for lexicalAnalyzer.hasNext() && lexicalAnalyzer.curChar != c {
-//		newToken += Token(lexicalAnalyzer.curChar)
-//		lexicalAnalyzer.nextChar()
-//	}
-//	if lexicalAnalyzer.curChar == c {
-//		lexicalAnalyzer.curToken = newToken
-//		return nil
-//	} else {
-//		return errors.New(fmt.Sprintf("Failed to reach character %c", c))
-//	}
-//}
-
-func (lexicalAnalyzer *LexicalAnalyzer) takeUntil(ignoreRunes map[rune]bool) error {
-	newToken := Undefined
-	for lexicalAnalyzer.hasNext() && !ignoreRunes[lexicalAnalyzer.curChar] {
-		newToken += Token(lexicalAnalyzer.curChar)
-		lexicalAnalyzer.nextChar()
+func (lexicalAnalyzer *LexicalAnalyzer) checkMatches(s string) bool {
+	oldPos := lexicalAnalyzer.curPos
+	oldChar := lexicalAnalyzer.curChar
+	for _, c := range s {
+		if lexicalAnalyzer.curChar == c {
+			lexicalAnalyzer.nextChar()
+		} else {
+			lexicalAnalyzer.curPos = oldPos
+			return false
+		}
 	}
-	if ignoreRunes[lexicalAnalyzer.curChar] {
-		lexicalAnalyzer.curToken = newToken
-		return nil
-	} else {
-		return errors.New(fmt.Sprintf("Failed to reach character %T", ignoreRunes))
+	//lexicalAnalyzer.nextChar()
+	if !lexicalAnalyzer.isWhitespace(lexicalAnalyzer.curChar) {
+		lexicalAnalyzer.curPos = oldPos
+		lexicalAnalyzer.curChar = oldChar
+		return false
 	}
+	return true
 }

@@ -82,3 +82,21 @@ func TestManyArgumentsWithReturnType(t *testing.T) {
 	)
 	testParser(t, parser, correctTree)
 }
+
+func testExpectFailure(t *testing.T, parser *Parser) {
+	tree, err := parser.Parse()
+	if err == nil {
+		url, err := tree.GraphUrl()
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Fatal(fmt.Sprintf("Expected failure, got: %s", url.String()))
+	} else {
+		t.Log(err.Error())
+	}
+}
+
+func TestBadEnding(t *testing.T) {
+	parser := NewParser("fun name():")
+	testExpectFailure(t, parser)
+}
