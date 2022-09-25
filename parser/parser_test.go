@@ -96,6 +96,41 @@ func testExpectFailure(t *testing.T, parser *Parser) {
 	}
 }
 
+func TestEmpty(t *testing.T) {
+	parser := NewParser("")
+	testExpectFailure(t, parser)
+}
+
+func TestOnlyFun(t *testing.T) {
+	parser := NewParser("fun")
+	testExpectFailure(t, parser)
+}
+
+func TestFunAndBracket(t *testing.T) {
+	parser := NewParser("fun (")
+	testExpectFailure(t, parser)
+}
+
+func TestNoArgumentNameAndType(t *testing.T) {
+	parser := NewParser("fun (:)")
+	testExpectFailure(t, parser)
+}
+
+func TestNoArgumentName(t *testing.T) {
+	parser := NewParser("fun (:type)")
+	testExpectFailure(t, parser)
+}
+
+func TestNoArgumentType(t *testing.T) {
+	parser := NewParser("fun (arg)")
+	testExpectFailure(t, parser)
+}
+
+func TestNoArgumentTypeWithColon(t *testing.T) {
+	parser := NewParser("fun (arg:)")
+	testExpectFailure(t, parser)
+}
+
 func TestBadEnding(t *testing.T) {
 	parser := NewParser("fun name():")
 	testExpectFailure(t, parser)
