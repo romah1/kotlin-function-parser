@@ -3,13 +3,15 @@ package parser
 type Token = string
 
 const (
-	Undefined = ""
-	LParen    = "("
-	RParen    = ")"
-	Comma     = ","
-	Fun       = "fun"
-	Colon     = ":"
-	End       = "$"
+	Undefined       = ""
+	LParen          = "("
+	RParen          = ")"
+	Comma           = ","
+	Fun             = "fun"
+	Colon           = ":"
+	End             = "$"
+	QuestionMark    = "?"
+	ExclamationMark = "!"
 )
 
 type LexicalAnalyzer struct {
@@ -33,6 +35,8 @@ type (
 	VariableAndTypeContinuation = Tree
 	Variable                    = Tree
 	Type                        = Tree
+	TypeName                    = Tree
+	TypeMark                    = Tree
 	Ending                      = Tree
 )
 

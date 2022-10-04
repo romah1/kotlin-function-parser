@@ -55,6 +55,12 @@ func (lexicalAnalyzer *LexicalAnalyzer) nextToken() error {
 		lexicalAnalyzer.curToken = Colon
 	case '$':
 		lexicalAnalyzer.curToken = End
+	case '?':
+		lexicalAnalyzer.nextChar()
+		lexicalAnalyzer.curToken = QuestionMark
+	case '!':
+		lexicalAnalyzer.nextChar()
+		lexicalAnalyzer.curToken = ExclamationMark
 	case 'f':
 		if lexicalAnalyzer.checkMatches("fun") {
 			lexicalAnalyzer.curToken = Fun
@@ -67,6 +73,8 @@ func (lexicalAnalyzer *LexicalAnalyzer) nextToken() error {
 			')': true,
 			',': true,
 			':': true,
+			'?': true,
+			'!': true,
 			'$': true,
 		}
 		newToken := ""

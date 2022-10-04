@@ -59,9 +59,17 @@ func NewVariable(name string) *Tree {
 	return NewTree("Variable", NewTree(name))
 }
 
-func NewType(name string) *Tree {
-	return NewTree("Type", NewTree(name))
+func NewType(name *TypeName, mark *TypeMark) *Tree {
+	return NewTree("Type", name, mark)
 }
+
+func NewTypeName(name string) *Tree {
+	return NewTree("TypeName", NewTree(name))
+}
+
+var QuestionTypeMark = NewTree("TypeMark", NewTree("Question"))
+var ExclamationTypeMark = NewTree("TypeMark", NewTree("Exclamation"))
+var EmptyTypeMark = NewTree("TypeMark")
 
 func NewFunctionName(name string) *Tree {
 	return NewTree("FunctionName", NewTree(name))

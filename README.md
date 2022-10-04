@@ -11,7 +11,8 @@ Arguments -> Variable,Arguments | eps
 Arguments -> VariableAndType
 VariableAndType -> Variableariable:Type
 Variable -> variable
-Type -> type
+Type -> TypeName | TypeNameTypeMark
+TypeMark = ? | ! | eps
 ```
 
 Removing right branching:
@@ -25,7 +26,8 @@ Arguments -> VariableAndTypeVariableAndType-continuation | eps
 VariableAndType-continuation -> ,VariableAndTypeVariableAndType-continuation | eps
 VariableAndType -> Variable:Type
 Variable -> variable
-Type -> type
+Type -> TypeName | TypeNameTypeMark
+TypeMark = ? | ! | eps
 ```
 
 First:
@@ -39,6 +41,8 @@ VariableAndType-continuation: {',', eps}
 VariableAndType: {variable}
 Variable: {variable}
 Type: {type}
+TypeName: {type}
+TypeMark: {!, ?}
 ```
 
 Follow:
@@ -52,4 +56,6 @@ VariableAndType-continuation: {)}
 VariableAndType: {',', )}
 Variable: {:}
 Type: {$, )}
+TypeName: {!, ?}
+TypeMark: {$, )}
 ```

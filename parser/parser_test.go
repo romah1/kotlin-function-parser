@@ -43,7 +43,19 @@ func TestNoArgsWithReturnType(t *testing.T) {
 		NewDeclaration(
 			NewFunctionName(funcName),
 			EmptyArguments,
-			NewEnding(NewType(returnTypeName)),
+			NewEnding(NewType(NewTypeName(returnTypeName), EmptyTypeMark)),
+		),
+	)
+	testParser(t, parser, correctTree)
+}
+
+func TestNoArgsWithReturnTypeWithMark(t *testing.T) {
+	parser := NewParser(fmt.Sprintf("fun %s(): %s?", funcName, returnTypeName))
+	correctTree := NewStart(
+		NewDeclaration(
+			NewFunctionName(funcName),
+			EmptyArguments,
+			NewEnding(NewType(NewTypeName(returnTypeName), QuestionTypeMark)),
 		),
 	)
 	testParser(t, parser, correctTree)
@@ -57,10 +69,33 @@ func TestOneArgWithReturnType(t *testing.T) {
 		NewDeclaration(
 			NewFunctionName(funcName),
 			NewArguments(
-				NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
+				NewVariableAndType(
+					NewVariable(argumentName),
+					NewType(NewTypeName(argumentType), EmptyTypeMark),
+				),
 				EmptyVariableAndTypeContinuation,
 			),
-			NewEnding(NewType(returnTypeName)),
+			NewEnding(NewType(NewTypeName(returnTypeName), EmptyTypeMark)),
+		),
+	)
+	testParser(t, parser, correctTree)
+}
+
+func TestOneArgWithReturnTypeWithMarks(t *testing.T) {
+	parser := NewParser(fmt.Sprintf(
+		"fun %s(%s:%s?): %s!",
+		funcName, argumentName, argumentType, returnTypeName))
+	correctTree := NewStart(
+		NewDeclaration(
+			NewFunctionName(funcName),
+			NewArguments(
+				NewVariableAndType(
+					NewVariable(argumentName),
+					NewType(NewTypeName(argumentType), QuestionTypeMark),
+				),
+				EmptyVariableAndTypeContinuation,
+			),
+			NewEnding(NewType(NewTypeName(returnTypeName), ExclamationTypeMark)),
 		),
 	)
 	testParser(t, parser, correctTree)
@@ -74,13 +109,19 @@ func TestTwoArgumentsWithReturnType(t *testing.T) {
 		NewDeclaration(
 			NewFunctionName(funcName),
 			NewArguments(
-				NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
+				NewVariableAndType(
+					NewVariable(argumentName),
+					NewType(NewTypeName(argumentType), EmptyTypeMark),
+				),
 				NewVariableAndTypeContinuation(
-					NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
+					NewVariableAndType(
+						NewVariable(argumentName),
+						NewType(NewTypeName(argumentType), EmptyTypeMark),
+					),
 					EmptyVariableAndTypeContinuation,
 				),
 			),
-			NewEnding(NewType(returnTypeName)),
+			NewEnding(NewType(NewTypeName(returnTypeName), EmptyTypeMark)),
 		),
 	)
 	testParser(t, parser, correctTree)
@@ -98,16 +139,25 @@ func TestThreeArgumentsWithReturnType(t *testing.T) {
 		NewDeclaration(
 			NewFunctionName(funcName),
 			NewArguments(
-				NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
+				NewVariableAndType(
+					NewVariable(argumentName),
+					NewType(NewTypeName(argumentType), EmptyTypeMark),
+				),
 				NewVariableAndTypeContinuation(
-					NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
+					NewVariableAndType(
+						NewVariable(argumentName),
+						NewType(NewTypeName(argumentType), EmptyTypeMark),
+					),
 					NewVariableAndTypeContinuation(
-						NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
+						NewVariableAndType(
+							NewVariable(argumentName),
+							NewType(NewTypeName(argumentType), EmptyTypeMark),
+						),
 						EmptyVariableAndTypeContinuation,
 					),
 				),
 			),
-			NewEnding(NewType(returnTypeName)),
+			NewEnding(NewType(NewTypeName(returnTypeName), EmptyTypeMark)),
 		),
 	)
 	testParser(t, parser, correctTree)

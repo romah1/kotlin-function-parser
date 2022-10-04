@@ -180,10 +180,41 @@ func (parser *Parser) variable() (*Tree, error) {
 }
 
 func (parser *Parser) variableType() (*Tree, error) {
-	variable := parser.lexicalAnalyzer.curToken
+	typeNameTree, err := parser.typeName()
+	if err != nil {
+		return nil, err
+	}
+	typeMarkTree, err := parser.typeMark()
+	if err != nil {
+		return nil, err
+	}
+	return NewType(typeNameTree, typeMarkTree), nil
+}
+
+func (parser *Parser) typeName() (*Tree, error) {
+	typeName := parser.lexicalAnalyzer.curToken
 	err := parser.lexicalAnalyzer.nextToken()
 	if err != nil {
 		return nil, err
 	}
-	return NewType(variable), nil
+	return NewTypeName(typeName), nil
+}
+
+func (parser *Parser) typeMark() (*Tree, error) {
+	switch parser.lexicalAnalyzer.curToken {
+	case QuestionMark:
+		err := parser.lexicalAnalyzer.nextToken()
+		if err != nil {
+			return nil, err
+		}
+		return QuestionTypeMark, nil
+	case ExclamationMark:
+		err := parser.lexicalAnalyzer.nextToken()
+		if err != nil {
+			return nil, err
+		}
+		return ExclamationTypeMark, nil
+	default:
+		return EmptyTypeMark, nil
+	}
 }
