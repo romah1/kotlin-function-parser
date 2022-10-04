@@ -160,7 +160,11 @@ func (parser *Parser) variableAndTypeContinuation() (*Tree, error) {
 		if err != nil {
 			return nil, err
 		}
-		return NewVariableAndTypeContinuation(variableAndTypeTree), nil
+		continuationTree, err := parser.variableAndTypeContinuation()
+		if err != nil {
+			return nil, err
+		}
+		return NewVariableAndTypeContinuation(variableAndTypeTree, continuationTree), nil
 	} else {
 		return EmptyVariableAndTypeContinuation, nil
 	}

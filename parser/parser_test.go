@@ -66,7 +66,7 @@ func TestOneArgWithReturnType(t *testing.T) {
 	testParser(t, parser, correctTree)
 }
 
-func TestManyArgumentsWithReturnType(t *testing.T) {
+func TestTwoArgumentsWithReturnType(t *testing.T) {
 	parser := NewParser(fmt.Sprintf(
 		"fun %s(%s:%s, %s:%s): %s",
 		funcName, argumentName, argumentType, argumentName, argumentType, returnTypeName))
@@ -75,7 +75,37 @@ func TestManyArgumentsWithReturnType(t *testing.T) {
 			NewFunctionName(funcName),
 			NewArguments(
 				NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
-				NewVariableAndTypeContinuation(NewVariableAndType(NewVariable(argumentName), NewType(argumentType))),
+				NewVariableAndTypeContinuation(
+					NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
+					EmptyVariableAndTypeContinuation,
+				),
+			),
+			NewEnding(NewType(returnTypeName)),
+		),
+	)
+	testParser(t, parser, correctTree)
+}
+
+func TestThreeArgumentsWithReturnType(t *testing.T) {
+	parser := NewParser(fmt.Sprintf(
+		"fun %s(%s:%s, %s:%s, %s:%s): %s",
+		funcName,
+		argumentName, argumentType,
+		argumentName, argumentType,
+		argumentName, argumentType,
+		returnTypeName))
+	correctTree := NewStart(
+		NewDeclaration(
+			NewFunctionName(funcName),
+			NewArguments(
+				NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
+				NewVariableAndTypeContinuation(
+					NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
+					NewVariableAndTypeContinuation(
+						NewVariableAndType(NewVariable(argumentName), NewType(argumentType)),
+						EmptyVariableAndTypeContinuation,
+					),
+				),
 			),
 			NewEnding(NewType(returnTypeName)),
 		),

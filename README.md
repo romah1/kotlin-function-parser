@@ -7,8 +7,7 @@ Grammar:
 Start -> fun Declaration
 Declaration -> FunctionName(Arguments)
 Declaraion -> FunctionName(Arguments):Type
-Arguments -> eps
-Arguments -> Variable,Arguments
+Arguments -> Variable,Arguments | eps
 Arguments -> VariableAndType
 VariableAndType -> Variableariable:Type
 Variable -> variable
@@ -21,12 +20,9 @@ Removing right branching:
 Start -> fun Declaration
 Declaration -> FunctionName(Arguments)Ending
 FunctionName -> name
-Ending -> eps
-Ending -> :Type
-Arguments -> eps
-Arguments -> VariableAndTypeVariableAndType-continuation
-VariableAndType-continuation -> ,VariableAndType
-VariableAndType-continuation -> eps
+Ending -> :Type | eps
+Arguments -> VariableAndTypeVariableAndType-continuation | eps
+VariableAndType-continuation -> ,VariableAndTypeVariableAndType-continuation | eps
 VariableAndType -> Variable:Type
 Variable -> variable
 Type -> type
@@ -34,16 +30,26 @@ Type -> type
 
 First:
 ```
-S: {fun}
-N: {s}
-A: {v}
-V: {v}
+Start: {fun}
+Declaration: {name}
+FunctionName: {name}
+Ending: {:, eps}
+Arguments: {variable, eps}
+VariableAndType-continuation: {',', eps}
+VariableAndType: {variable}
+Variable: {variable}
+Type: {type}
 ```
 
 Follow:
 ```
-S: {$}
-N: {$}
-A: {)}
-V: {,}
+Start: {$}
+Declaration: {$}
+FunctionName: {(}
+Ending: {$}
+Arguments: {)}
+VariableAndType-continuation: {)}
+VariableAndType: {',', )}
+Variable: {:}
+Type: {$, )}
 ```

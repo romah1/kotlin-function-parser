@@ -49,8 +49,8 @@ func NewVariableAndType(variable *Variable, variableType *Type) *Tree {
 	return NewTree("VariableAndType", variable, ColonTree, variableType)
 }
 
-func NewVariableAndTypeContinuation(variableAndType *VariableAndType) *Tree {
-	return NewTree("VariableAndTypeContinuation", CommaTree, variableAndType)
+func NewVariableAndTypeContinuation(variableAndType *VariableAndType, continuation *VariableAndTypeContinuation) *Tree {
+	return NewTree("VariableAndTypeContinuation", CommaTree, variableAndType, continuation)
 }
 
 var EmptyVariableAndTypeContinuation = NewTree("VariableAndTypeContinuation")
